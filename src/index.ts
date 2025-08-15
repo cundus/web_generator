@@ -6,12 +6,17 @@ import healthRouter from "./controllers/health.controller";
 import webGeneratorRouter from "./controllers/web_generator";
 import databaseRouter from "./controllers/database.controller";
 import databaseService from "./services/database.service";
+import { authenticateApiKey } from "./middleware/auth.middleware";
 
 const app = express();
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 app.use(cors());
 app.use(express.json());
+// Handle CORS preflight requests early (do not require API key)
+app.options("*", cors());
+// Protect all endpoints with API key authentication
+app.use(authenticateApiKey);
 
 app.use("/", healthRouter);
 app.use("/web-generator", webGeneratorRouter);

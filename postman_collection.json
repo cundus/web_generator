@@ -1,0 +1,302 @@
+{
+	"info": {
+		"_postman_id": "web-generator-api-collection",
+		"name": "Web Generator API",
+		"description": "Complete API collection for the Web Generator project with v0.dev integration and Vercel deployment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "web-generator"
+	},
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{ "key": "key", "value": "X-API-Key", "type": "string" },
+			{ "key": "value", "value": "{{api_key}}", "type": "string" },
+			{ "key": "in", "value": "header", "type": "string" }
+		]
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Application Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Check if the application is running and healthy"
+					},
+					"response": []
+				}
+			],
+			"description": "Health check endpoints for monitoring application status"
+		},
+		{
+			"name": "Web Generator",
+			"item": [
+				{
+					"name": "Test Web Generator",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/web-generator/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"web-generator",
+								""
+							]
+						},
+						"description": "Test endpoint to verify web generator service is running"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Website",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"owner\": \"johndoe\",\n  \"message\": \"Create a modern portfolio website with dark theme\",\n  \"description\": \"A professional portfolio website showcasing projects and skills\",\n  \"app_name\": \"portfolio\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/web-generator/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"web-generator",
+								"create"
+							]
+						},
+						"description": "Generate and deploy a new website using v0.dev and Vercel. The website will be available at {app_name}.trady.finance or {owner}.trady.finance if app_name is not provided."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Chats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/web-generator/chats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"web-generator",
+								"chats"
+							]
+						},
+						"description": "Retrieve all chat sessions from v0.dev"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Projects",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/web-generator/projects",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"web-generator",
+								"projects"
+							]
+						},
+						"description": "Retrieve all projects from v0.dev"
+					},
+					"response": []
+				}
+			],
+			"description": "Main web generator functionality for creating and managing websites"
+		},
+		{
+			"name": "Database",
+			"item": [
+				{
+					"name": "Database Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/db/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"db",
+								"health"
+							]
+						},
+						"description": "Check database connection health and pool status"
+					},
+					"response": []
+				},
+				{
+					"name": "Database Version",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/db/version",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"db",
+								"version"
+							]
+						},
+						"description": "Get PostgreSQL database version information"
+					},
+					"response": []
+				},
+				{
+					"name": "List Tables",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/db/tables",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"db",
+								"tables"
+							]
+						},
+						"description": "List all tables in the public schema"
+					},
+					"response": []
+				},
+				{
+					"name": "Setup Database",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/db/setup",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"db",
+								"setup"
+							]
+						},
+						"description": "Create the web_generator table and indexes if they don't exist"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Web Generator Records",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/db/web-generator",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"db",
+								"web-generator"
+							]
+						},
+						"description": "Retrieve all web generator project records from the database"
+					},
+					"response": []
+				}
+			],
+			"description": "Database management and monitoring endpoints"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string",
+			"description": "Base URL for the Web Generator API"
+		},
+		{
+			"key": "api_key",
+			"value": "",
+			"type": "string",
+			"description": "API key sent in X-API-Key header"
+		}
+	]
+}
