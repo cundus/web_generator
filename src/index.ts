@@ -14,7 +14,6 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 app.use(cors());
 app.use(express.json());
 // Handle CORS preflight requests early (do not require API key)
-app.options("*", cors());
 // Protect all endpoints with API key authentication
 app.use(authenticateApiKey);
 
