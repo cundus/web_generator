@@ -26,6 +26,6 @@ export async function addAndReviewDomain(domain: string, deploymentId: string,pr
     console.error(
       error instanceof Error ? `Error: ${error.message}` : String(error)
     );
-    return null;
+    throw error; // Re-throw the error so it can be handled by the controller
   }
 }

@@ -69,11 +69,15 @@ export const generateWeb = async ({
 
   // 5. add domain to vercel
   const customDomain = domainName + ".trady.finance";
-  await addAndReviewDomain(
+  const domainResult = await addAndReviewDomain(
     customDomain,
     deployment.id,
     deployment.inspectorUrl.split("/")[4]
   );
+
+  if (!domainResult) {
+    throw new Error("Failed to add custom domain to Vercel");
+  }
 
   // 6. return result with URLs
   const result = {

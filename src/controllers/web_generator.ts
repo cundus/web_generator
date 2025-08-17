@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { generateWeb } from "../services/web_generator";
 import { findChat, getProjects } from "../services/v0.service";
+import { log } from "node:console";
 
 const router = Router();
 
@@ -37,6 +38,7 @@ router.get("/projects",async (_req: Request, res: Response) => {
         const projects = await getProjects();
         res.json(projects);
     } catch (error) {
+      console.log(error);
         res.status(500).json({
             error: error instanceof Error ? error.message : "Unknown error",
         });
