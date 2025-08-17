@@ -25,6 +25,7 @@ router.post("/create", async (_req: Request, res: Response) => {
     const result = await generateWeb({ owner, message, description, app_name });
     res.json(result);
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
