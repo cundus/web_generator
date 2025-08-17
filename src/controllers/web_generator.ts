@@ -1,7 +1,6 @@
 import { Router, Request, Response } from "express";
 import { generateWeb } from "../services/web_generator";
 import { findChat, getProjects } from "../services/v0.service";
-import { log } from "node:console";
 
 const router = Router();
 

@@ -2,6 +2,11 @@ import { createProject, createChat, deployToVercel } from "./v0.service";
 import { addAndReviewDomain } from "./vercel.service";
 
 /**
+ * Reserved subdomains that cannot be used directly
+ */
+const RESERVED_SUBDOMAINS = ['app', 'engine', 'waha'];
+
+/**
  * Sanitize owner name to only allow letters and numbers
  * Converts to lowercase and removes any non-alphanumeric characters
  */
@@ -26,6 +31,27 @@ const sanitizeOwner = (owner: string): string => {
   return sanitized;
 };
 
+/**
+ * Generate domain name with reserved subdomain handling
+ * If app_name is a reserved subdomain, prefix it with owner name
+ */
+const generateDomainName = (owner: string, app_name?: string): string => {
+  const sanitizedOwner = sanitizeOwner(owner);
+  
+  if (!app_name) {
+    return sanitizedOwner;
+  }
+  
+  const sanitizedAppName = sanitizeOwner(app_name);
+  
+  // Check if the app_name is a reserved subdomain
+  if (RESERVED_SUBDOMAINS.includes(sanitizedAppName)) {
+    return `${sanitizedOwner}${sanitizedAppName}`;
+  }
+  
+  return sanitizedAppName;
+};
+
 export const generateWeb = async ({
   owner,
   message,
@@ -40,8 +66,8 @@ export const generateWeb = async ({
   // Sanitize owner to only allow letters and numbers
   const sanitizedOwner = sanitizeOwner(owner);
 
-  // Determine domain name: use app_name if provided, otherwise use owner
-  const domainName = app_name ? sanitizeOwner(app_name) : sanitizedOwner;
+  // Generate domain name with reserved subdomain handling
+  const domainName = generateDomainName(owner, app_name);
 
   // 1. create project
   const project = await createProject(
