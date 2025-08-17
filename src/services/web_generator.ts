@@ -72,7 +72,7 @@ export const generateWeb = async ({
   // 1. create project
   const project = await createProject(
     sanitizedOwner,
-    "project_" + sanitizedOwner,
+   "project_" + sanitizedOwner,
     description
   );
   // 2. create chat

@@ -1,0 +1,13 @@
+services:
+  app:
+    # PROD: build and run the slim image
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: webgen:prod
+    container_name: webgen
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
