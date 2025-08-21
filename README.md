@@ -7,6 +7,7 @@ A Node.js/TypeScript web application with PostgreSQL integration that generates 
 - Node.js (v16 or higher)
 - PostgreSQL (v12 or higher)
 - npm or yarn
+- Redis (v6 or higher) for the background queue
 
 ## Database Setup
 
@@ -86,6 +87,8 @@ The application exposes the following endpoints:
   - `POST /web-generator/create` - Generate and deploy a website
   - `GET /web-generator/chats` - List v0.dev chats
   - `GET /web-generator/projects` - List v0.dev projects
+  - `GET /web-generator/status/:jobId` - Get job status and result
+  - `GET /web-generator/queue/stats` - Queue statistics
 
 - Database
   - `GET /db/health` - Database connection health and pool status
@@ -93,6 +96,104 @@ The application exposes the following endpoints:
   - `GET /db/tables` - List all tables in the public schema
   - `POST /db/setup` - Create `web_generator` table and indexes
   - `GET /db/web-generator` - List stored web generator records
+
+## Queue (Background Jobs)
+
+This project includes a Bull-powered queue for running web generation in the background: `src/services/queue.service.ts`.
+
+- Uses Redis (`REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`).
+- Registers its processor when the module is imported.
+- HTTP endpoints available:
+  - `POST /web-generator/create` to enqueue a job
+  - `GET /web-generator/status/:jobId` to check status/progress/result
+  - `GET /web-generator/queue/stats` to see queue counts
+
+### Run Redis
+
+- Docker (recommended):
+  ```bash
+  docker run -d --name redis -p 6379:6379 redis:7
+  ```
+
+### Run the worker
+
+Two options:
+
+- Same process (quick): import the worker during app boot by adding an import of `src/services/queue.service` to ensure the processor is registered.
+- Separate process (recommended): create a minimal `worker.ts` that imports `./services/queue.service` and run it with ts-node. This keeps API and worker isolated.
+
+### Enqueue a job (programmatic test)
+
+Create a small script (e.g., `scripts/enqueue.ts`) and run with ts-node:
+
+```ts
+import { queueService } from "../src/services/queue.service";
+
+async function main() {
+  const jobId = await queueService.addWebGenerationJob({
+    owner: "johndoe",
+    message: "Create a modern portfolio website",
+    description: "A personal portfolio",
+    app_name: "portfolio"
+  });
+  console.log("enqueued job:", jobId);
+}
+
+main().catch(console.error);
+```
+
+Then check status in another small script (e.g., `scripts/status.ts`):
+
+```ts
+import { queueService } from "../src/services/queue.service";
+
+async function main() {
+  const jobId = process.argv[2];
+  if (!jobId) throw new Error("Usage: ts-node scripts/status.ts <jobId>");
+  const status = await queueService.getJobStatus(jobId);
+  console.log(status);
+}
+
+main().catch(console.error);
+```
+
+Notes:
+- Ensure `V0_API_KEY`, `VERCEL_API_KEY`, and database env vars are set—queue jobs call external services and the DB via `generateWeb()`.
+- Logs in `queue.service.ts` show progress, completion, and failures.
+
+## Webhooks (job completion/failure)
+
+If `WEBHOOK_URL` is set in `.env`, the worker will POST a JSON payload when a job completes or fails.
+
+- URL: value of `WEBHOOK_URL`
+- Method: `POST`
+- Headers: `Content-Type: application/json`
+
+Payloads:
+
+- Completed
+  ```json
+  {
+    "jobId": "<job id>",
+    "status": "completed",
+    "result": {
+      "success": true,
+      "data": { /* deployment info from generateWeb */ }
+    }
+  }
+  ```
+
+- Failed
+  ```json
+  {
+    "jobId": "<job id>",
+    "status": "failed",
+    "error": "<error message>"
+  }
+  ```
+
+Notes:
+- No retries/signatures are implemented yet. If you need signed payloads and retry/backoff for reliability, tell me and I’ll add them.
 
 ## Project Structure
 
@@ -108,6 +209,7 @@ src/
 │   ├── database.service.ts       # PostgreSQL connection service
 │   ├── v0.service.ts             # V0 API service
 │   └── vercel.service.ts         # Vercel API service
+│   └── queue.service.ts          # Bull queue for background jobs
 └── index.ts                      # Main application entry point
 ```
 
@@ -132,6 +234,9 @@ src/
 | `API_KEY` | API key required for all endpoints (sent as `X-API-Key`) | (required) |
 | `VERCEL_API_KEY` | Vercel API token for domain management | (required) |
 | `V0_API_KEY` | v0.dev API key (used by v0-sdk) | (required) |
+| `REDIS_HOST` | Redis host for Bull queue | `localhost` |
+| `REDIS_PORT` | Redis port for Bull queue | `6379` |
+| `REDIS_PASSWORD` | Redis password for Bull queue |  |
 | `DB_HOST` | Database host | `localhost` |
 | `DB_PORT` | Database port | `5432` |
 | `DB_NAME` | Database name | `web_generator` |
